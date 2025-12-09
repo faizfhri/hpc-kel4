@@ -53,3 +53,6 @@ a.out
 # Test files
 test_*
 temp_*
+
+# SSH keys (temporary)
+.ssh_temp/

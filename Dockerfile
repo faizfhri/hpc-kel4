@@ -17,23 +17,25 @@ RUN mkdir -p /run/sshd
 RUN useradd faiz --uid=11000 -m -s /bin/bash
 RUN echo "faiz:faiz123" | chpasswd
 
-# 4. Setup SSH untuk MPI tanpa password dan host key verification
-RUN mkdir -p /home/faiz/.ssh && \
-    ssh-keygen -t rsa -f /home/faiz/.ssh/id_rsa -N '' && \
-    cat /home/faiz/.ssh/id_rsa.pub >> /home/faiz/.ssh/authorized_keys && \
-    chmod 600 /home/faiz/.ssh/authorized_keys && \
-    chmod 700 /home/faiz/.ssh && \
-    chown -R faiz:faiz /home/faiz/.ssh
+# 4. Setup SSH keys (pre-generated for all nodes)
+RUN mkdir -p /root/.ssh_template && \
+    ssh-keygen -t rsa -f /root/.ssh_template/id_rsa -N '' && \
+    cat /root/.ssh_template/id_rsa.pub >> /root/.ssh_template/authorized_keys && \
+    echo "Host *" > /root/.ssh_template/config && \
+    echo "    StrictHostKeyChecking no" >> /root/.ssh_template/config && \
+    echo "    UserKnownHostsFile=/dev/null" >> /root/.ssh_template/config && \
+    echo "    LogLevel ERROR" >> /root/.ssh_template/config && \
+    chmod 600 /root/.ssh_template/id_rsa && \
+    chmod 644 /root/.ssh_template/id_rsa.pub && \
+    chmod 600 /root/.ssh_template/authorized_keys && \
+    chmod 600 /root/.ssh_template/config
 
-# 5. Configure SSH untuk skip host key verification
-RUN echo "Host *" >> /home/faiz/.ssh/config && \
-    echo "    StrictHostKeyChecking no" >> /home/faiz/.ssh/config && \
-    echo "    UserKnownHostsFile=/dev/null" >> /home/faiz/.ssh/config && \
-    chmod 600 /home/faiz/.ssh/config && \
-    chown faiz:faiz /home/faiz/.ssh/config
+# 5. Copy startup script
+COPY docker_startup.sh /usr/local/bin/docker_startup.sh
+RUN chmod +x /usr/local/bin/docker_startup.sh
 
 # 6. Set working directory
 WORKDIR /home/faiz
 
-# 7. Jalankan SSH Daemon saat container start
-CMD ["/usr/sbin/sshd", "-D"]
+# 7. Run startup script (will copy SSH keys and start daemon)
+CMD ["/usr/local/bin/docker_startup.sh"]

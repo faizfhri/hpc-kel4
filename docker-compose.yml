@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Head Node - Master MPI node
   hpchead:
@@ -67,7 +65,9 @@ networks:
   mpi-net:
     driver: bridge
     name: mpi-net
+    external: false
 
 volumes:
   mpi_home:
     name: mpi_home
+    external: false
