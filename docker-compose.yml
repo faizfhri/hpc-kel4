@@ -1,6 +1,9 @@
 services:
   # Head Node - Master MPI node
   hpchead:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: mpi-node
     container_name: hpchead
     hostname: hpchead
