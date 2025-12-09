@@ -30,12 +30,17 @@ RUN mkdir -p /root/.ssh_template && \
     chmod 600 /root/.ssh_template/authorized_keys && \
     chmod 600 /root/.ssh_template/config
 
-# 5. Copy startup script
+# 5. Copy source files to template (will be copied to /home/faiz on startup)
+RUN mkdir -p /root/source_template
+COPY matrix.c /root/source_template/matrix.c
+COPY serial.c /root/source_template/serial.c
+
+# 6. Copy startup script
 COPY docker_startup.sh /usr/local/bin/docker_startup.sh
 RUN chmod +x /usr/local/bin/docker_startup.sh
 
-# 6. Set working directory
+# 7. Set working directory
 WORKDIR /home/faiz
 
-# 7. Run startup script (will copy SSH keys and start daemon)
+# 8. Run startup script (will copy SSH keys, source files, and start SSH daemon)
 CMD ["/usr/local/bin/docker_startup.sh"]

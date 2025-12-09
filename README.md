@@ -163,11 +163,20 @@ source venv/bin/activate
 streamlit run app.py
 ```
 
-### Using Docker Compose (Alternative)
+### Manual Docker Setup
 
 ```bash
-# Build and start all containers
+# 1. Build the Docker image
+docker-compose build --no-cache
+
+# 2. Start all containers (SSH keys and source files are auto-configured)
 docker-compose up -d
+
+# 3. Verify cluster is ready (all nodes should respond)
+docker exec -it hpchead su - faiz -c "mpirun -np 4 --host hpchead,node01,node02,node03 hostname"
+
+# 4. Check source files are present
+docker exec hpchead ls -la /home/faiz/
 
 # View logs
 docker-compose logs -f
@@ -175,6 +184,8 @@ docker-compose logs -f
 # Stop cluster
 docker-compose down
 ```
+
+**Note**: SSH keys and source files are automatically configured via startup script. No manual setup required!
 
 ---
 
@@ -195,7 +206,21 @@ Then access via: `http://<your-server-ip>:8501`
 
 ### 2. Start the Cluster
 
-Navigate to **🏠 Overview** page and click **"🚀 Start Cluster"**
+**Option A: Via Streamlit UI** (Recommended)
+- Navigate to **🏠 Overview** page and click **"🚀 Start Cluster"**
+- Wait for all nodes to show "Running" status
+- SSH keys and source files are automatically configured!
+
+**Option B: Via Command Line**
+```bash
+# Start cluster (auto-configures everything)
+docker-compose up -d
+
+# Verify cluster is ready
+docker exec -it hpchead su - faiz -c "mpirun -np 4 --host hpchead,node01,node02,node03 hostname"
+```
+
+**Note**: All setup (SSH keys, source files) happens automatically via startup script!
 
 ### 3. Run Your First Benchmark
 
@@ -359,6 +384,118 @@ Operations = 2 × N³
 ### DevOps
 - **Git**: Version control
 - **Bash**: Automation scripts
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### 1. "Host key verification failed" Error
+
+**Symptom**: Multi-node MPI fails with SSH errors
+```bash
+Host key verification failed.
+[mpiexec@hpchead] ui_cmd_cb (mpiexec/pmiserv_pmci.c:51): Launch proxy failed.
+```
+
+**Root Cause**: Startup script didn't run properly or SSH keys weren't copied
+
+**Solution 1**: Restart containers to trigger startup script
+```bash
+docker-compose restart
+```
+
+**Solution 2**: Manual SSH key setup (if restart doesn't work)
+```bash
+for node in hpchead node01 node02 node03; do
+    docker exec $node bash -c "
+    mkdir -p /home/faiz/.ssh
+    cp /root/.ssh_template/* /home/faiz/.ssh/
+    chown -R faiz:faiz /home/faiz/.ssh
+    chmod 700 /home/faiz/.ssh
+    chmod 600 /home/faiz/.ssh/id_rsa
+    chmod 644 /home/faiz/.ssh/id_rsa.pub
+    chmod 600 /home/faiz/.ssh/authorized_keys
+    chmod 600 /home/faiz/.ssh/config
+    "
+done
+```
+
+**Verify**: Test SSH connectivity
+```bash
+docker exec -it hpchead su - faiz -c "ssh node01 hostname"
+```
+
+#### 2. Source Files Not Found
+
+**Symptom**: Compilation fails with "No such file or directory"
+
+**Root Cause**: Startup script didn't copy source files or they're missing from image
+
+**Solution 1**: Restart containers
+```bash
+docker-compose restart
+```
+
+**Solution 2**: Manual copy (if restart doesn't work)
+```bash
+docker cp matrix.c hpchead:/home/faiz/
+docker cp serial.c hpchead:/home/faiz/
+docker exec hpchead chown faiz:faiz /home/faiz/*.c
+```
+
+**Solution 3**: Rebuild image
+```bash
+docker-compose down
+docker rmi mpi-node
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+#### 3. Out of Memory Errors with 16 Processes
+
+**Symptom**: MPI fails with memory allocation errors
+
+**Solution**: Already fixed in `docker-compose.yml` with `shm_size: 512m`. If still occurring:
+```bash
+# Verify shared memory size
+docker exec hpchead df -h /dev/shm
+
+# Should show 512M
+```
+
+#### 4. Docker Compose Build Fails
+
+**Symptom**: Image build errors or missing files
+
+**Solution**: Clean rebuild
+```bash
+docker-compose down
+docker rmi mpi-node
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+#### 5. Streamlit Shows "Cluster Not Running"
+
+**Symptom**: Dashboard can't connect to containers
+
+**Solution**: Restart Docker and cluster
+```bash
+# Restart Docker service
+sudo service docker restart
+
+# Restart cluster
+docker-compose down
+docker-compose up -d
+```
+
+#### 6. Perfect Square Error for Cannon's Algorithm
+
+**Symptom**: "Number of processes must be a perfect square"
+
+**Solution**: Use 4, 9, or 16 processes (2², 3², 4²) for Cannon's algorithm
 
 ---
 
