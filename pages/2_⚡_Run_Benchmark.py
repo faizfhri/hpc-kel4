@@ -116,7 +116,7 @@ with col2:
     )
     
     # Additional parameters
-    if exec_mode in ["Single Node", "Multi Node"]:
+    if exec_mode in ["Single Node", "Multi Node", "Compare All"]:
         num_processes = st.select_slider(
             "Number of Processes:",
             options=[1, 2, 4, 8, 16],

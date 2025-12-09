@@ -103,28 +103,72 @@ st.header("🖥️ Cluster Status")
 # Get cluster status
 cluster_status = docker_mgr.get_cluster_status()
 
+# Summary metrics
+running_nodes = sum(1 for status in cluster_status.values() if status == "running")
+total_nodes = len(cluster_status)
+
+col_metric1, col_metric2, col_metric3 = st.columns(3)
+with col_metric1:
+    st.metric("Active Nodes", f"{running_nodes}/{total_nodes}")
+with col_metric2:
+    health = "Healthy" if running_nodes == total_nodes else "Degraded" if running_nodes > 0 else "Offline"
+    st.metric("Cluster Health", health)
+with col_metric3:
+    st.metric("Total Capacity", f"{total_nodes * 4} cores")
+
+st.markdown("")
+
 # Create columns for each node
 cols = st.columns(4)
 
 nodes_info = [
-    ("hpchead", "Head Node"),
-    ("node01", "Worker 1"),
-    ("node02", "Worker 2"),
-    ("node03", "Worker 3")
+    ("hpchead", "Head Node", "🖥️"),
+    ("node01", "Worker 1", "⚙️"),
+    ("node02", "Worker 2", "⚙️"),
+    ("node03", "Worker 3", "⚙️")
 ]
 
-for col, (node_name, node_label) in zip(cols, nodes_info):
+for col, (node_name, node_label, icon) in zip(cols, nodes_info):
     with col:
         status = cluster_status.get(node_name, "unknown")
         
+        # Node card with real status
         if status == "running":
-            st.success(f"**{node_label}**\n\nStatus: Running")
+            st.success(f"{icon} **{node_label}**")
+            st.markdown("**Status:** Running ✓")
+            
+            # Get real container info
+            try:
+                container = docker_mgr.client.containers.get(node_name)
+                attrs = container.attrs
+                
+                # Calculate uptime
+                started_at = attrs['State']['StartedAt']
+                st.caption(f"ID: {container.short_id}")
+                st.caption(f"Started: {started_at[:19].replace('T', ' ')}")
+                
+            except Exception as e:
+                st.caption("Info unavailable")
+                
         elif status == "exited":
-            st.warning(f"**{node_label}**\n\nStatus: Stopped")
+            st.warning(f"{icon} **{node_label}**")
+            st.markdown("**Status:** Stopped")
+            st.caption("Start cluster to activate")
+            
         elif status == "not_found":
-            st.error(f"**{node_label}**\n\nStatus: Not Found")
+            st.error(f"{icon} **{node_label}**")
+            st.markdown("**Status:** Not Created")
+            st.caption("Container needs to be created")
+            
+        elif status == "docker_unavailable":
+            st.error(f"{icon} **{node_label}**")
+            st.markdown("**Status:** Docker Offline")
+            st.caption("Start Docker service")
+            
         else:
-            st.info(f"**{node_label}**\n\nStatus: {status}")
+            st.info(f"{icon} **{node_label}**")
+            st.markdown(f"**Status:** {status.title()}")
+            st.caption(f"Unexpected state: {status}")
 
 st.markdown("---")
 
