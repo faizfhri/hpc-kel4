@@ -6,19 +6,22 @@ set -e
 
 echo "🚀 Setting up HPC Benchmark Environment on Alpine Linux..."
 
-# Check if running as root
+# Check if running as root - adjust commands accordingly
 if [ "$(id -u)" -eq 0 ]; then
-    echo "⚠️  Please run this script as a normal user, not root"
-    exit 1
+    echo "Running as root - will install packages directly"
+    SUDO=""
+else
+    echo "Running as normal user - will use sudo"
+    SUDO="sudo"
 fi
 
 # Update package index
 echo "📦 Updating package index..."
-sudo apk update
+$SUDO apk update
 
 # Install system dependencies
 echo "🔧 Installing system dependencies..."
-sudo apk add --no-cache \
+$SUDO apk add --no-cache \
     python3 \
     py3-pip \
     python3-dev \
@@ -35,12 +38,14 @@ sudo apk add --no-cache \
 
 # Setup Docker
 echo "🐳 Configuring Docker..."
-sudo rc-update add docker boot
-sudo service docker start
+$SUDO rc-update add docker boot 2>/dev/null || true
+$SUDO service docker start 2>/dev/null || true
 
-# Add current user to docker group
-sudo addgroup $USER docker 2>/dev/null || true
-echo "⚠️  You may need to log out and log back in for docker group changes to take effect"
+# Add current user to docker group (only if not root)
+if [ "$(id -u)" -ne 0 ]; then
+    $SUDO addgroup $USER docker 2>/dev/null || true
+    echo "⚠️  You may need to log out and log back in for docker group changes to take effect"
+fi
 
 # Create Python virtual environment
 echo "🐍 Creating Python virtual environment..."
