@@ -1,0 +1,11 @@
+# Abaikan file binary hasil compile
+matrix
+matrix_mul
+serial_matrix
+*.o
+
+# Abaikan file hasil benchmark (biar user baru generate sendiri)
+*.csv
+
+# Abaikan folder sistem
+.DS_Store
