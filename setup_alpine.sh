@@ -72,6 +72,25 @@ docker network create mpi-net 2>/dev/null || echo "Network already exists"
 echo "💾 Creating shared volume..."
 docker volume create mpi_home 2>/dev/null || echo "Volume already exists"
 
+# Install ngrok (optional for remote access)
+echo ""
+echo "🌐 Installing ngrok for remote access..."
+if ! command -v ngrok &> /dev/null; then
+    if [ "$(uname -m)" = "x86_64" ]; then
+        wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+        $SUDO tar xvzf ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+        rm ngrok-v3-stable-linux-amd64.tgz
+        echo "✅ ngrok installed successfully"
+    elif [ "$(uname -m)" = "aarch64" ]; then
+        wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz
+        $SUDO tar xvzf ngrok-v3-stable-linux-arm64.tgz -C /usr/local/bin
+        rm ngrok-v3-stable-linux-arm64.tgz
+        echo "✅ ngrok installed successfully"
+    fi
+else
+    echo "✅ ngrok already installed"
+fi
+
 echo ""
 echo "✅ Setup complete!"
 echo ""
@@ -80,5 +99,12 @@ echo "  1. Activate virtual environment: source venv/bin/activate"
 echo "  2. Run Streamlit app: streamlit run app.py"
 echo "  3. Access in browser: http://localhost:8501"
 echo ""
-echo "To run on network (accessible from other machines):"
+echo "To access remotely using ngrok:"
+echo "  1. Sign up at https://ngrok.com and get your authtoken"
+echo "  2. Authenticate: ngrok config add-authtoken YOUR_TOKEN"
+echo "  3. Start Streamlit: streamlit run app.py"
+echo "  4. In new terminal: ngrok http 8501"
+echo "  5. Copy the https URL (e.g., https://xxxx.ngrok.io)"
+echo ""
+echo "Alternative - run on network (LAN access):"
 echo "  streamlit run app.py --server.address=0.0.0.0 --server.port=8501"
