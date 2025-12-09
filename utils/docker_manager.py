@@ -151,7 +151,9 @@ class DockerManager:
         """Execute a command in a container and return (exit_code, output)"""
         try:
             container = self.client.containers.get(container_name)
-            exit_code, output = container.exec_run(command)
+            # Run as user 'faiz' to ensure SSH keys are accessible
+            exec_cmd = f"su - faiz -c '{command}'"
+            exit_code, output = container.exec_run(exec_cmd)
             return exit_code, output.decode('utf-8')
         except Exception as e:
             logger.error(f"Failed to execute command in {container_name}: {e}")

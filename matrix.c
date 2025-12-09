@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
     for(int i = 0; i < np; ++i) source[i] = i*(np+1);
     for(int i = 1; i < np; ++i){
         for(int j = 0; j < np; ++j){
-            if((source[(i-1)np+j] + 1) >= np(j+1)) source[i*np+j]=np*(j);
+            if((source[(i-1)*np+j] + 1) >= np*(j+1)) source[i*np+j]=np*(j);
             else source[i*np+j]=source[(i-1)*np+j] + 1;
         }
     }
