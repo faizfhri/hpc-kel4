@@ -123,6 +123,15 @@ with col2:
             value=4,
             help="Total MPI processes (must be perfect square for matrix multiplication)"
         )
+        
+        # Validation warnings
+        import math
+        sqrt_val = math.sqrt(num_processes)
+        if sqrt_val != int(sqrt_val):
+            st.warning(f"⚠️ {num_processes} bukan kuadrat sempurna. Gunakan 1, 4, 9, atau 16 untuk matrix multiplication.")
+        
+        if num_processes > 8:
+            st.info("ℹ️ Processes > 8 membutuhkan shared memory lebih besar. Jika error, kurangi jumlah processes atau ukuran matrix.")
     else:
         num_processes = 1
 
@@ -197,17 +206,24 @@ if st.button("RUN BENCHMARK", type="primary", use_container_width=True):
                     status_text.text("Benchmark completed successfully")
                     st.session_state.last_result = result
                 else:
-                    st.error(f"Benchmark failed: {result.get('error')}")
-                    if show_output and 'error' in result:
-                        st.code(result['error'])
+                    # Show user-friendly error if available
+                    if 'user_error' in result:
+                        st.error(f"❌ {result['user_error']}")
+                    else:
+                        st.error(f"❌ Benchmark failed: {result.get('error', 'Unknown error')}")
+                    
+                    # Show raw error in expander
+                    if 'error' in result:
+                        with st.expander("Technical Details"):
+                            st.code(result['error'])
             
             elif exec_mode == "Single Node":
                 # Single node parallel
-                status_text.text("🔧 Compiling parallel code...")
+                status_text.text("Compiling parallel code...")
                 progress_bar.progress(20)
                 time.sleep(0.5)
                 
-                status_text.text(f"🚀 Running on single node with {num_processes} processes...")
+                status_text.text(f"Running on single node with {num_processes} processes...")
                 progress_bar.progress(40)
                 
                 result = bench_runner.run_parallel_benchmark(
@@ -216,20 +232,25 @@ if st.button("RUN BENCHMARK", type="primary", use_container_width=True):
                 progress_bar.progress(100)
                 
                 if result["success"]:
-                    status_text.text("✅ Benchmark completed successfully!")
+                    status_text.text("Benchmark completed successfully")
                     st.session_state.last_result = result
                 else:
-                    st.error(f"❌ Benchmark failed: {result.get('error')}")
-                    if show_output and 'error' in result:
-                        st.code(result['error'])
+                    if 'user_error' in result:
+                        st.error(f"❌ {result['user_error']}")
+                    else:
+                        st.error(f"❌ Benchmark failed: {result.get('error', 'Unknown error')}")
+                    
+                    if 'error' in result:
+                        with st.expander("Technical Details"):
+                            st.code(result['error'])
             
             elif exec_mode == "Multi Node":
                 # Multi node parallel
-                status_text.text("🔧 Compiling parallel code...")
+                status_text.text("Compiling parallel code...")
                 progress_bar.progress(20)
                 time.sleep(0.5)
                 
-                status_text.text(f"🚀 Running across multiple nodes with {num_processes} processes...")
+                status_text.text(f"Running across multiple nodes with {num_processes} processes...")
                 progress_bar.progress(40)
                 
                 result = bench_runner.run_parallel_benchmark(
@@ -238,12 +259,17 @@ if st.button("RUN BENCHMARK", type="primary", use_container_width=True):
                 progress_bar.progress(100)
                 
                 if result["success"]:
-                    status_text.text("✅ Benchmark completed successfully!")
+                    status_text.text("Benchmark completed successfully")
                     st.session_state.last_result = result
                 else:
-                    st.error(f"❌ Benchmark failed: {result.get('error')}")
-                    if show_output and 'error' in result:
-                        st.code(result['error'])
+                    if 'user_error' in result:
+                        st.error(f"❌ {result['user_error']}")
+                    else:
+                        st.error(f"❌ Benchmark failed: {result.get('error', 'Unknown error')}")
+                    
+                    if 'error' in result:
+                        with st.expander("Technical Details"):
+                            st.code(result['error'])
             
             else:  # Compare All
                 status_text.text("🔧 Running comprehensive comparison...")

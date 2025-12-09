@@ -170,6 +170,20 @@ class BenchmarkRunner:
             "raw_output": output
         }
         
+        # Check for common errors and provide user-friendly messages
+        if "kuadrat sempurna" in output.lower() or "perfect square" in output.lower():
+            result["user_error"] = "Jumlah proses harus kuadrat sempurna (1, 4, 9, 16, ...)"
+        elif "host key verification failed" in output.lower():
+            result["user_error"] = "SSH host key verification gagal. Rebuild Docker image dengan: docker-compose build"
+        elif "not enough memory" in output.lower() or "out of memory" in output.lower():
+            result["user_error"] = "Memori tidak cukup. Kurangi jumlah proses atau ukuran matrix"
+        elif "/dev/shm" in output.lower():
+            result["user_error"] = "Shared memory penuh. Gunakan maksimal 8 processes atau perbesar shm_size di docker-compose.yml"
+        elif "connection refused" in output.lower():
+            result["user_error"] = "Koneksi ke worker node gagal. Pastikan semua nodes running"
+        elif exit_code := re.search(r'exit code (\d+)', output.lower()):
+            result["user_error"] = f"Proses gagal dengan exit code {exit_code.group(1)}"
+        
         # Extract execution time
         time_match = re.search(r'Total Time Elapsed is ([\d.]+) seconds', output)
         if time_match:
