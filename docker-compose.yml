@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # Head Node - Master MPI node
+  hpchead:
+    image: mpi-node
+    container_name: hpchead
+    hostname: hpchead
+    networks:
+      - mpi-net
+    volumes:
+      - mpi_home:/home/faiz
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+  # Worker Node 1
+  node01:
+    image: mpi-node
+    container_name: node01
+    hostname: node01
+    networks:
+      - mpi-net
+    volumes:
+      - mpi_home:/home/faiz
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    depends_on:
+      - hpchead
+
+  # Worker Node 2
+  node02:
+    image: mpi-node
+    container_name: node02
+    hostname: node02
+    networks:
+      - mpi-net
+    volumes:
+      - mpi_home:/home/faiz
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    depends_on:
+      - hpchead
+
+  # Worker Node 3
+  node03:
+    image: mpi-node
+    container_name: node03
+    hostname: node03
+    networks:
+      - mpi-net
+    volumes:
+      - mpi_home:/home/faiz
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    depends_on:
+      - hpchead
+
+networks:
+  mpi-net:
+    driver: bridge
+    name: mpi-net
+
+volumes:
+  mpi_home:
+    name: mpi_home

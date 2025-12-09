@@ -1,0 +1,22 @@
+# Python Dependencies for HPC Benchmark Streamlit App
+# Optimized for Alpine Linux
+
+# Core Framework
+streamlit>=1.28.0
+
+# Data Processing & Visualization
+plotly>=5.17.0
+pandas>=2.0.0
+
+# Docker Integration
+docker>=6.1.0
+
+# SSH & Remote Execution
+paramiko>=3.3.1
+
+# Advanced UI Components
+streamlit-aggrid>=0.3.4
+
+# Utilities
+psutil>=5.9.0
+numpy>=1.24.0

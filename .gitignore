@@ -1,11 +1,55 @@
-# Abaikan file binary hasil compile
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Docker
+.docker/
+
+# Benchmark results
+results/
+*.csv
+benchmark_results_*.json
+data/*.json
+
+# Compiled binaries
 matrix
 matrix_mul
 serial_matrix
+serial
 *.o
+*.out
+*.exe
+a.out
 
-# Abaikan file hasil benchmark (biar user baru generate sendiri)
-*.csv
-
-# Abaikan folder sistem
-.DS_Store
+# Test files
+test_*
+temp_*
