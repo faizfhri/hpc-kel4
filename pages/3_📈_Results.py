@@ -159,10 +159,7 @@ if "tests" in result:
                 "Execution Mode": mode.replace('_', ' ').title(),
                 "Time (seconds)": f"{data['execution_time']:.4f}",
                 "Speedup": f"{data.get('speedup', 1.0):.2f}x",
-                "Efficiency": f"{data.get('efficiency', 1.0):.2%}",
-                "Processes": data.get('num_processes', 1),
-                "GFLOPS": f"{data.get('gflops', 0):.2f}",
-                "Memory (MB)": f"{data.get('memory_mb', 0):.2f}"
+                "Processes": data.get('num_processes', 1)
             })
     
     df = pd.DataFrame(rows)
