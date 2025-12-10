@@ -39,7 +39,7 @@ st.markdown("""
 st.markdown("""
     <div class='run-header'>
         <h1 style='color: white; margin: 0;'>⚡ Run Benchmark</h1>
-        <p style='color: white; margin: 0.5rem 0 0 0; font-size: 1.2rem;'>Interactive Performance Testing</p>
+        <p style='color: white; margin: 0.5rem 0 0 0; font-size: 1.2rem;'>Fox's Algorithm - Matrix Multiplication</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -81,17 +81,8 @@ st.header("⚙️ Benchmark Configuration")
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    # Algorithm selection
-    algorithm = st.selectbox(
-        "Algorithm:",
-        [
-            "Matrix Multiplication",
-            "LU Decomposition (Coming Soon)",
-            "Cholesky Decomposition (Coming Soon)",
-            "Matrix Transpose (Coming Soon)"
-        ],
-        help="Select matrix operation for benchmarking"
-    )
+    # Algorithm (Fox's Algorithm for Matrix Multiplication)
+    algorithm = "Matrix Multiplication"
     
     # Matrix size
     matrix_size = st.slider(
@@ -173,11 +164,6 @@ with col3:
 
 # Run button
 if st.button("RUN BENCHMARK", type="primary", use_container_width=True):
-    
-    # Validate algorithm
-    if "Coming Soon" in algorithm:
-        st.error("This algorithm is not yet implemented. Please select Matrix Multiplication.")
-        st.stop()
     
     # Create results container
     results_container = st.container()

@@ -8,8 +8,8 @@ from pathlib import Path
 
 # Page configuration
 st.set_page_config(
-    page_title="HPC Benchmark Dashboard",
-    page_icon="🚀",
+    page_title="Fox Algorithm HPC Benchmark Dashboard",
+    page_icon="🦊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -167,26 +167,24 @@ st.markdown("""
 # Sidebar
 with st.sidebar:
     st.markdown("""
+    ### Kelompok 4:
+    140810220002 - Muhammad Faiz Fahri\n
+    140810220074 - Muhammad Rizki Putra\n
+    140810220080 - Muhammad Satria Dharma
+    """)
+
+    st.markdown("""
         <div style='text-align: center; padding: 1rem;'>
-            <h1 style='color: white; font-size: 2.5rem; margin: 0;'>🚀</h1>
-            <h2 style='color: white; margin: 0.5rem 0;'>HPC Benchmark</h2>
+            <h1 style='color: white; font-size: 2.5rem; margin: 0;'>🦊</h1>
+            <h2 style='color: white; margin: 0.5rem 0;'>Fox Algorithm HPC Benchmark</h2>
         </div>
     """, unsafe_allow_html=True)
     st.markdown("---")
     
-    st.markdown("""
-    ### Navigation
-    Available sections:
-    - System Overview
-    - Run Benchmarks
-    - Results Analysis
-    - Documentation
-    """)
-    
     st.markdown("---")
     st.markdown("""
     ### About
-    **HPC Matrix Operations Benchmark**
+    **HPC Fox Algorithm Matrix Multiplication Benchmark**
     
     Distributed computing platform utilizing:
     - Docker containerization
@@ -197,7 +195,7 @@ with st.sidebar:
     """)
 
 # Main page content
-st.title("🚀 HPC Matrix Operations Benchmark")
+st.title("🦊 HPC Fox Algorithm Matrix Multiplication Benchmark")
 st.markdown("### Interactive Performance Analysis Dashboard")
 
 st.markdown("---")
@@ -209,30 +207,21 @@ with col1:
     st.markdown("""
     ## Dashboard Overview
     
-    This platform provides comprehensive HPC benchmarking capabilities:
+    This platform provides HPC benchmarking capabilities:
     
-    **Run benchmarks** on various matrix algorithms  
+    **Run benchmarks** on fox matrix algorithms  
     **Compare performance** between serial and parallel execution  
     **Visualize results** with interactive charts  
-    **Analyze memory** usage and efficiency  
     **Test configurations** across single-node and multi-node setups  
     
     ### Getting Started
     1. Navigate to Run Benchmark to execute tests
     2. Configure matrix size and execution mode
     3. View detailed analysis in Results & Analysis
-    
-    ### System Requirements
-    - Docker runtime environment
-    - MPI cluster (4 nodes: hpchead, node01-03)
-    - Minimum 4GB RAM
     """)
 
 with col2:
-    st.info("**Recommendation**: Begin with matrix sizes 100-500 for initial system validation.")
-    
-    st.success("**Documentation**: Comprehensive HPC concepts and implementation details available in the Documentation section.")
-    
+    st.info("**Kelompok 4**:\n 140810220002, 140810220074, 140810220080")
     st.warning("**Prerequisite**: Ensure all Docker containers are active before benchmark execution.")
 
 st.markdown("---")

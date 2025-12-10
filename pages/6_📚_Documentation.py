@@ -137,15 +137,6 @@ with tab2:
     Time for 1000×1000: ~5 seconds
     Speedup: 3.6x
     ```
-    
-    #### Amdahl's Law
-    The theoretical speedup is limited by the serial portion of the code:
-    
-    **Speedup = 1 / [(1 - P) + P/N]**
-    
-    Where:
-    - P = Parallel portion of code
-    - N = Number of processors
     """)
 
 with tab3:
@@ -221,17 +212,18 @@ with col1:
 
 with col2:
     st.markdown("""
-    ### Parallel Algorithm (Cannon's Algorithm)
+    ### Parallel Algorithm (Fox's Algorithm)
     
-    **Strategy**: Distribute matrix blocks across processes
+    **Strategy**: Block-wise matrix multiplication with row broadcast
     
-    1. **Partition**: Divide matrices into blocks
-    2. **Distribute**: Send blocks to different processes
-    3. **Compute**: Each process computes its block
-    4. **Communicate**: Exchange blocks as needed
-    5. **Gather**: Collect final result
+    1. **Partition**: Divide matrices into √P × √P blocks
+    2. **Distribute**: Each process gets one block of A and B
+    3. **Broadcast**: Diagonal blocks of A broadcast along rows
+    4. **Multiply**: Local multiplication of current blocks
+    5. **Shift**: Circular shift of B blocks upward
+    6. **Repeat**: Steps 3-5 for √P iterations
     
-    **Benefit**: N³ operations distributed across P processes
+    **Benefit**: Efficient communication pattern with O(N³/P) computation per process
     
     **Theoretical speedup: P times faster!**
     """)
@@ -409,22 +401,6 @@ with col2:
     ```
     Ideal: Time stays constant
     ```
-    
-    #### 4. GFLOPS
-    **Giga FLoating point Operations Per Second**
-    ```
-    GFLOPS = Operations / (Time × 10⁹)
-    ```
-    
-    For matrix multiplication (N×N):
-    ```
-    Operations = 2 × N³
-    
-    Example for N=1000:
-    Operations = 2 × 10⁹
-    If time = 5s:
-    GFLOPS = 2 / 5 = 0.4 GFLOPS
-    ```
     """)
 
 st.markdown("---")
@@ -543,10 +519,9 @@ Navigate to **🏠 Overview** page to:
 #### 2️⃣ Run Your First Benchmark
 Go to **Run Benchmark** page:
 
-1. **Select Algorithm**: Choose "Matrix Multiplication"
-2. **Set Matrix Size**: Start with 500 for quick test
-3. **Choose Mode**: Try "Compare All" to see all modes
-4. **Click Run**: Watch the benchmark execute!
+1. **Set Matrix Size**: Start with 500 for quick test
+2. **Choose Mode**: Try "Compare All" to see all modes
+3. **Click Run**: Watch the benchmark execute!
 
 #### 3️⃣ Analyze Results
 Visit **Results & Analysis** page to:
@@ -571,103 +546,10 @@ Look for:
 
 st.markdown("---")
 
-# Troubleshooting
-with st.expander("Troubleshooting"):
-    st.markdown("""
-    ### Common Issues and Solutions
-    
-    #### Docker not available
-    **Problem**: "Docker is not available" error
-    
-    **Solutions**:
-    ```bash
-    # Check Docker status
-    docker ps
-    
-    # Start Docker (Alpine)
-    service docker start
-    
-    # Start Docker (Debian/Ubuntu)
-    sudo systemctl start docker
-    
-    # Add user to docker group
-    sudo usermod -aG docker $USER
-    # Log out and back in
-    ```
-    
-    #### Containers not starting
-    **Problem**: Nodes show as "not_found"
-    
-    **Solutions**:
-    ```bash
-    # Check if image exists
-    docker images | grep mpi-node
-    
-    # Rebuild image
-    docker build -t mpi-node .
-    
-    # Check network
-    docker network ls | grep mpi-net
-    
-    # Recreate network
-    docker network create mpi-net
-    ```
-    
-    #### Slow compilation
-    **Problem**: Compilation takes too long
-    
-    **Solutions**:
-    - Check container CPU limits
-    - Ensure sufficient resources allocated to Docker
-    - Restart Docker daemon
-    
-    #### MPI errors
-    **Problem**: "MPI_Init failed" or connection errors
-    
-    **Solutions**:
-    ```bash
-    # Exec into head node
-    docker exec -it hpchead bash
-    
-    # Test SSH connectivity
-    ssh node01
-    ssh node02
-    ssh node03
-    
-    # Regenerate SSH keys if needed
-    ssh-keygen -t rsa
-    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-    ```
-    """)
-
-# References
-with st.expander("📚 References and Further Reading"):
-    st.markdown("""
-    ### Recommended Resources
-    
-    #### Books:
-    - "Introduction to Parallel Computing" by Ananth Grama
-    - "Parallel Programming with MPI" by Peter Pacheco
-    - "High Performance Computing" by Charles Severance
-    
-    #### Online Resources:
-    - [MPI Tutorial](https://mpitutorial.com/)
-    - [OpenMPI Documentation](https://www.open-mpi.org/doc/)
-    - [Docker Documentation](https://docs.docker.com/)
-    - [Streamlit Documentation](https://docs.streamlit.io/)
-    
-    #### Papers:
-    - Cannon's Algorithm for Matrix Multiplication
-    - Amdahl's Law and Gustafson's Law
-    - Scalability in Parallel Computing
-    """)
-
-st.markdown("---")
-
 # Footer
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 2rem;'>
-    <p><strong>HPC Matrix Operations Benchmark</strong></p>
+    <p><strong>HPC Fox Algorithm Matrix Operations Benchmark</strong></p>
     <p>Built for High Performance Computing Course</p>
     <p>Team: Kelompok 4 | 2025</p>
 </div>
